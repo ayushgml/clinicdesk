@@ -30,4 +30,4 @@ def export_filename(patient_id: str, extension: str = "json") -> str:
     safe = "".join(c for c in patient_id if c.isalnum() or c in "-_")
     if not safe or extension not in ("json", "csv"):
         raise ValueError("Invalid export name")
-    return f"{safe}.{extension}"
+    return f"{safe.lower()}.{extension}"
