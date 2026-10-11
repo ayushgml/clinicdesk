@@ -13,3 +13,7 @@ creates a new dispatcher and does not inherit any cached writes.
 
 Model prices use USD per million tokens. Provider-reported usage includes
 reasoning output where applicable; accounting is cumulative within a run.
+
+If a task returns a failure record, inspect its trace error and failed_checks.
+An empty usage list means no model response was recorded. Keep traces outside
+version control. Use the locked environment when reproducing a run.
