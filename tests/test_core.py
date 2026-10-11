@@ -152,3 +152,19 @@ def test_snapshot_is_independent(desk):
 def test_clock_time_does_not_invalidate_dob(desk):
     desk.set_request('I am Alex Morgan, DOB 1985-04-12. Book 14:00 on 2026-11-02.')
     assert desk.call('find_patient',{'name':'Alex Morgan','dob':'1985-04-12'})['status']=='ok'
+
+
+def test_preflight_uses_the_validated_tool_boundary(desk):
+    desk.set_request('I am Alex Morgan, DOB September 3, 1990.')
+    result=desk.verify_supplied_identity()
+    assert result['status']=='ok' and desk.verified=='p2'
+    assert desk.log[-1]['tool']=='find_patient'
+
+
+def test_preflight_does_not_guess_or_authorize_family(desk):
+    desk.set_request('My name is Alex Morgan.')
+    assert desk.verify_supplied_identity() is None
+    assert desk.verified is None
+    desk.set_request('My wife Alex Morgan, DOB 1985-04-12.')
+    assert desk.verify_supplied_identity()['status']=='blocked'
+    assert desk.verified is None
