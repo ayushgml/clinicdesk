@@ -16,7 +16,7 @@ class Store:
         else:
             self.data = json.loads(self.path.read_text())
 
-    def save(self):
+    def save(self) -> None:
         temporary = self.path.with_suffix(".tmp")
         temporary.write_text(json.dumps(self.data, indent=2) + "\n")
         os.replace(temporary, self.path)
