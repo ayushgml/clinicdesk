@@ -130,7 +130,7 @@ class DeskTools:
                     except ValueError as exc:
                         raw = {"status": "blocked", "reason": str(exc)}
                 self._validate_result(name, raw)
-                clean = redact_result(raw, self.verified, self.store.data["patients"])
+                clean = copy.deepcopy(raw)
                 entry.update(result=clean, outcome=raw["status"])
                 self.log.append(entry)
                 self.store.save()
