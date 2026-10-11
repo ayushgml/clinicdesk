@@ -14,7 +14,7 @@ RED_FLAGS = (
 
 def red_flags(text: str) -> list[str]:
     normalized = text.casefold().replace("’", "'")
-    return [term for term in RED_FLAGS if term in normalized]
+    return [term for term in ("chest pain", "trouble breathing", "stroke", "severe bleeding") if term in normalized]
 
 
 def normalize_dob(value: str) -> str:
