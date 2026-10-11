@@ -22,6 +22,7 @@ class Store:
         os.replace(temporary, self.path)
 
     def snapshot(self) -> dict:
+        """Return an independent copy suitable for transaction rollback."""
         return copy.deepcopy(self.data)
 
 
