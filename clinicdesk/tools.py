@@ -9,7 +9,7 @@ class ToolFailure(RuntimeError):
     pass
 
 class DeskTools:
-    max_retries = 3
+    max_retries = 0
 
     def __init__(self, store, task_id: str, seed: int, faults: dict | None = None):
         self.store = store
