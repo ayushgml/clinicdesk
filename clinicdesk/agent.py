@@ -13,7 +13,7 @@ find_patient(name,dob); get_availability(clinician,date); book_appointment(patie
 Clinicians: dr_lee general; dr_rao dermatology; dr_kim cardiology. Use ISO slots, e.g. 2026-11-02T09:00. Availability must be checked before booking. Do not put private appointment annotations in confirmations. Be concise. No markdown fences. Always use $patient after find_patient; never invent an ID. Plan related actions together, including send_message and finish. After a confirmation succeeds, finish; do not repeat the workflow."""
 
 class Agent:
-    history_turns = 12
+    history_turns = 1
     max_rounds = 8
 
     def __init__(self, llm, tools):
