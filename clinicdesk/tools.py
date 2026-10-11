@@ -22,7 +22,7 @@ class DeskTools:
         self.attempts = {}
         self.cache = {}
 
-    def set_request(self, text: str):
+    def set_request(self, text: str) -> None:
         self.request = text
 
     def verify_supplied_identity(self):
