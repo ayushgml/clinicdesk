@@ -48,6 +48,9 @@ class DeskTools:
         self._identity(args["patient_id"])
         if red_flags(self.request):
             raise ValueError("Urgent symptoms: escalate to nurse now; no routine booking")
+        requested_times = re.findall(r"\b\d{2}:\d{2}\b", self.request)
+        if requested_times and args["slot"][11:16] not in requested_times:
+            raise ValueError("Caller has not authorized this appointment time")
         for row in self.store.data["appointments"]:
             if row["status"] == "booked" and row["slot"] == args["slot"]:
                 if row["patient_id"] == args["patient_id"] or row["clinician"] == args["clinician"]:

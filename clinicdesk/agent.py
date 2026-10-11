@@ -24,6 +24,20 @@ class Agent:
         self.last_appointment = None
         self.pending_confirmation = False
 
+    def _confirm_pending(self):
+        if self.pending_confirmation and self.tools.verified:
+            updates = []
+            for entry in self.tools.log:
+                if entry["outcome"] != "ok":
+                    continue
+                if entry["tool"] in ("book_appointment", "cancel_appointment"):
+                    row = entry["result"]["appointment"]
+                    updates.append(f"Appointment {row['id']}: {row['status']} for {row['slot']}")
+                elif entry["tool"] == "escalate_to_nurse":
+                    updates.append("Nurse review requested")
+            self.tools.call("send_message", {"patient_id": self.tools.verified, "text": "; ".join(updates) or "Clinic request processed."})
+            self.pending_confirmation = False
+
     def _resolve(self, arguments):
         values = {}
         for key, value in arguments.items():
@@ -71,9 +85,7 @@ class Agent:
             confirmed = False
             for action in actions:
                 if action.tool == "finish":
-                    if self.pending_confirmation and self.tools.verified:
-                        observations.append({"error": "Call send_message to confirm the successful action before finish."})
-                        break
+                    self._confirm_pending()
                     self.responses.append(action.arguments["text"])
                     finished = True
                     break
@@ -97,4 +109,5 @@ class Agent:
             self.turns[-1]["exchanges"].extend(exchanges)
             if finished or (confirmed and not self.pending_confirmation):
                 return
+        self._confirm_pending()
         self.responses.append("I could not complete this request. Please contact the clinic front desk.")
