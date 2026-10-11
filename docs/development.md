@@ -7,3 +7,6 @@ avoid ambiguity for callers from different locales.
 
 The harness passes correlation metadata through environment variables. Local
 traces retain missing fields as null so consumers can distinguish unset values.
+
+Write deduplication applies within one conversation only. A new evaluation
+creates a new dispatcher and does not inherit any cached writes.
