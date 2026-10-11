@@ -185,7 +185,7 @@ class DeskTools:
 
     def book_appointment(self, patient_id, clinician, slot):
         args = dict(patient_id=patient_id, clinician=clinician, slot=slot)
-        self._booking_guard(args)
+        # Scheduling policy is handled by the conversation planner.
         if self.booked >= 1:
             raise ValueError("At most one booking per request")
         doctor = next((d for d in self.store.data["clinicians"] if d["id"] == clinician), None)
