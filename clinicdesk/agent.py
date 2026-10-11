@@ -39,6 +39,7 @@ class Agent:
         self.turns = self.turns[-self.history_turns:]
         request = "\n".join(t["message"] for t in self.turns)
         self.tools.set_request(request)
+        self.tools.verify_supplied_identity()
         messages = []
         for turn in self.turns:
             messages.append({"role": "user", "content": turn["message"]})
@@ -88,4 +89,4 @@ class Agent:
             self.turns[-1]["exchanges"].extend(exchanges)
             if finished or (confirmed and not self.pending_confirmation):
                 return
-        raise RuntimeError("Conversation action limit reached")
+        self.responses.append("I could not complete this request. Please contact the clinic front desk.")

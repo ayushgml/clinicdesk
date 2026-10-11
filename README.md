@@ -62,7 +62,10 @@ text. No tracing service or tracing key is required.
 
 The model plans ordered tool actions in strict JSON. `$patient` resolves only from
 a successful identity lookup; `$appointment` resolves the last new booking.
-Invalid plans receive a bounded correction opportunity. The conversation is a
+Supplied name and birth date are verified through the same retrying tool boundary
+before planning. Invalid plans receive a bounded correction opportunity. When the
+action limit is reached, the agent returns an administrative handoff; checks still
+require the requested state changes and confirmations. The conversation is a
 single request across turns and permits at most one new booking. Booking conflicts
 use exact slot equality; all synthetic slots have the same duration.
 

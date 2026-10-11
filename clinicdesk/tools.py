@@ -25,6 +25,21 @@ class DeskTools:
     def set_request(self, text: str):
         self.request = text
 
+    def verify_supplied_identity(self):
+        """Verify only credentials literally present in the caller's request."""
+        dates = re.findall(r"\d{4}-\d{2}-\d{2}|\d{1,2}/\d{1,2}/\d{4}|[A-Za-z]+ \d{1,2}, \d{4}|\d{1,2} [A-Za-z]+ \d{4}", self.request)
+        normalized = set()
+        for date in dates:
+            try:
+                normalized.add(normalize_dob(date))
+            except ValueError:
+                continue
+        candidates = [p for p in self.store.data["patients"] if p["name"].casefold() in self.request.casefold() and p["dob"] in normalized]
+        if len(candidates) == 1:
+            patient = candidates[0]
+            return self.call("find_patient", {"name": patient["name"], "dob": patient["dob"]})
+        return None
+
     def _identity(self, patient_id):
         if self.verified != patient_id:
             raise ValueError("Verify the caller's own name AND date of birth first")
@@ -192,6 +207,8 @@ class DeskTools:
         return {"status": "ok", "appointment": row}
 
     def escalate_to_nurse(self, patient_id, reason, urgency):
+        if patient_id == "unverified" and self.verified:
+            patient_id = self.verified
         if patient_id != "unverified":
             self._identity(patient_id)
         row = {"patient_id": patient_id, "reason": reason, "urgency": urgency}
