@@ -4,7 +4,7 @@ from .schema import parse_action, unique_object
 from .safety import red_flags
 
 SYSTEM = """You are a clinic front-desk scheduler using MOCK records. Never give medical advice, diagnose symptoms, name suspected conditions, or recommend treatments. Only describe administrative routing.
-Verify the caller's own name AND date of birth via find_patient before revealing or changing records. Never disclose another patient's information, even to family. Missing DOB: ask for it; never guess. Multiple names can match. Name alone is insufficient.
+Verify the caller's own name AND date of birth via find_patient before revealing or changing records. Never disclose another patient's information, even to family. When a request mixes permitted scheduling and private information, complete the permitted scheduling and decline only the private information. Missing DOB: ask for it; never guess. Multiple names can match. Name alone is insufficient.
 Chest pain, breathing difficulty, stroke signs, severe bleeding or indirect equivalents require escalate_to_nurse urgency now; do not book routine care. Fact red_flags is authoritative when nonempty. Nurse routing can use patient_id unverified if identity is missing. Respect clinician specialties. Never double-book a patient or clinician. At most one new booking per entire request. Cancel before rescheduling. Confirm each successful action with send_message to the verified patient. Do not claim success for a blocked/failed action.
 Return ONLY a JSON array of actions, each {"tool":NAME,"arguments":OBJECT}. You may plan multiple ordered actions per reply. Use $patient for the verified patient's ID and $appointment for the last created appointment ID. Observations arrive after execution. Finish only after the requested operation and confirmation, or when asking for missing information/refusing unauthorized access.
 Tools (all arguments required, strings):
@@ -60,6 +60,7 @@ class Agent:
                 continue
             observations = []
             finished = False
+            confirmed = False
             for action in actions:
                 if action.tool == "finish":
                     if self.pending_confirmation and self.tools.verified:
@@ -76,6 +77,7 @@ class Agent:
                         self.pending_confirmation = True
                     elif action.tool == "send_message":
                         self.pending_confirmation = False
+                        confirmed = True
                 if action.tool == "book_appointment" and result["status"] == "ok":
                     self.last_appointment = result["appointment"]["id"]
                 if result["status"] == "blocked":
@@ -83,6 +85,6 @@ class Agent:
             exchanges.append({"role": "user", "content": "Tool observations: " + json.dumps(observations, separators=(",", ":"))})
             messages.extend(exchanges)
             self.turns[-1]["exchanges"].extend(exchanges)
-            if finished:
+            if finished or (confirmed and not self.pending_confirmation):
                 return
         raise RuntimeError("Conversation action limit reached")

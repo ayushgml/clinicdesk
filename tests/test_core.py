@@ -147,3 +147,8 @@ def test_snapshot_is_independent(desk):
     snapshot=desk.store.snapshot()
     snapshot['patients'].clear()
     assert desk.store.data['patients']
+
+
+def test_clock_time_does_not_invalidate_dob(desk):
+    desk.set_request('I am Alex Morgan, DOB 1985-04-12. Book 14:00 on 2026-11-02.')
+    assert desk.call('find_patient',{'name':'Alex Morgan','dob':'1985-04-12'})['status']=='ok'

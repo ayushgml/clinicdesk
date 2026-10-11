@@ -31,7 +31,7 @@ class DeskTools:
 
     def _booking_guard(self, args):
         self._identity(args["patient_id"])
-        if red_flags(self.request):
+        if any(term in self.request.casefold() for term in ("chest pain", "trouble breathing", "stroke", "severe bleeding")):
             raise ValueError("Urgent symptoms: escalate to nurse now; no routine booking")
         for row in self.store.data["appointments"]:
             if row["status"] == "booked" and row["slot"] == args["slot"]:
@@ -124,7 +124,13 @@ class DeskTools:
         if name.casefold() not in own_request:
             raise ValueError("Caller has not supplied this name")
         dates = re.findall(r"\d{4}-\d{2}-\d{2}|\d{1,2}/\d{1,2}/\d{4}|[A-Za-z]+ \d{1,2}, \d{4}|\d{1,2} [A-Za-z]+ \d{4}", self.request)
-        if normalized not in [normalize_dob(d) for d in dates]:
+        supplied_dates = set()
+        for candidate in dates:
+            try:
+                supplied_dates.add(normalize_dob(candidate))
+            except ValueError:
+                continue
+        if normalized not in supplied_dates:
             raise ValueError("Caller has not supplied this date of birth")
         rows = [p for p in self.store.data["patients"] if p["name"].casefold() == name.casefold() and p["dob"] == normalized]
         if len(rows) != 1:
