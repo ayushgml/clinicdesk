@@ -46,7 +46,7 @@ class DeskTools:
 
     def _booking_guard(self, args):
         self._identity(args["patient_id"])
-        if any(term in self.request.casefold() for term in ("chest pain", "trouble breathing", "stroke", "severe bleeding")):
+        if red_flags(self.request):
             raise ValueError("Urgent symptoms: escalate to nurse now; no routine booking")
         for row in self.store.data["appointments"]:
             if row["status"] == "booked" and row["slot"] == args["slot"]:
