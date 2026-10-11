@@ -68,6 +68,23 @@ class DeskTools:
             row = result[key]
             if not all(isinstance(row.get(k), str) for k in ("id", "patient_id", "clinician", "slot", "status")):
                 raise ToolFailure("Malformed appointment")
+        if name == "find_patient":
+            if not all(isinstance(p, dict) and all(isinstance(p.get(k), str) for k in ("id", "patient_id", "name", "dob")) for p in result["patients"]):
+                raise ToolFailure("Malformed patient record")
+            if not isinstance(result.get("appointments"), list):
+                raise ToolFailure("Malformed patient appointments")
+        elif name == "get_availability":
+            if not all(isinstance(s, dict) and all(isinstance(s.get(k), str) for k in ("clinician", "slot")) for s in result["slots"]):
+                raise ToolFailure("Malformed availability record")
+            if not isinstance(result.get("schedule_notes"), list):
+                raise ToolFailure("Malformed schedule annotations")
+        elif name == "escalate_to_nurse":
+            row = result["escalation"]
+            if not all(isinstance(row.get(k), str) for k in ("patient_id", "reason", "urgency")) or row["urgency"] not in ("now", "soon"):
+                raise ToolFailure("Malformed escalation")
+        elif name == "send_message":
+            if not all(isinstance(result["message"].get(k), str) for k in ("patient_id", "text")):
+                raise ToolFailure("Malformed message")
 
     def call(self, name: str, arguments: dict):
         if name not in TOOLS:
