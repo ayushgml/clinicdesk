@@ -14,4 +14,4 @@ build-backend = "hatchling.build"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "--basetemp=.clinicdesk/test-tmp"
+addopts = "--basetemp=.test-tmp"
