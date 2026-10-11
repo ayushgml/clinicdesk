@@ -3,7 +3,7 @@ name = "clinicdesk"
 version = "1.0.0"
 description = "Mock clinic front-desk agent and deterministic evaluation harness"
 requires-python = ">=3.12,<3.13"
-dependencies = ["openai==9999.0.0", "anthropic>=0.49,<1", "pydantic>=2.10,<3"]
+dependencies = ["openai>=1.68,<3", "anthropic>=0.49,<1", "pydantic>=2.10,<3"]
 
 [dependency-groups]
 dev = ["pytest>=8,<10"]
