@@ -40,11 +40,17 @@ class Agent:
         request = "\n".join(t["message"] for t in self.turns)
         self.tools.set_request(request)
         self.tools.verify_supplied_identity()
+        detected = red_flags(request)
+        routed = False
+        if detected and self.tools.verified:
+            self.tools.call("escalate_to_nurse", {"patient_id": self.tools.verified, "reason": "; ".join(detected), "urgency": "now"})
+            self.tools.call("send_message", {"patient_id": self.tools.verified, "text": "Your request has been routed to the nurse for immediate review."})
+            routed = True
         messages = []
         for turn in self.turns:
             messages.append({"role": "user", "content": turn["message"]})
             messages.extend(turn["exchanges"])
-        facts = {"red_flags": red_flags(request), "verified_patient": self.tools.verified}
+        facts = {"red_flags": red_flags(request), "verified_patient": self.tools.verified, "nurse_notified_and_confirmed": routed}
         messages[-1]["content"] += "\nRouting facts: " + json.dumps(facts)
         for _ in range(self.max_rounds):
             reply = self.llm.complete(SYSTEM, messages)
@@ -82,6 +88,8 @@ class Agent:
                         confirmed = True
                 if action.tool == "book_appointment" and result["status"] == "ok":
                     self.last_appointment = result["appointment"]["id"]
+                if action.tool == "get_availability":
+                    break
                 if result["status"] == "blocked":
                     break
             exchanges.append({"role": "user", "content": "Tool observations: " + json.dumps(observations, separators=(",", ":"))})

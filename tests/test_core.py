@@ -120,6 +120,8 @@ def test_full_eval_with_scripted_client(tmp_path):
                 {'tool':'send_message','arguments':{'patient_id':'$patient','text':'Booked your checkup.'}},
                 {'tool':'finish','arguments':{'text':'Confirmed.'}},
             ]
+            if any('"slots"' in m["content"] for m in messages):
+                actions = actions[2:]
             return Reply(json.dumps(actions),0,0,0)
     result=run_task(load_task('t01'),0,Scripted(),tmp_path)
     assert result['passed'], result

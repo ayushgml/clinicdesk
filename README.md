@@ -71,7 +71,9 @@ use exact slot equality; all synthetic slots have the same duration.
 
 The tools are `find_patient`, `get_availability`, `book_appointment`,
 `cancel_appointment`, `escalate_to_nurse`, and `send_message`. Their strict argument
-schemas live in `schema.py`. Code supplies urgent-symptom facts, verifies caller
+schemas live in `schema.py`. Code routes detected urgent symptoms to the mock nurse and confirms that routing,
+then supplies the facts to the planner. Availability reads are observation barriers:
+the planner sees results before choosing dependent actions. Code verifies caller
 credentials, guards bookings, filters other patients' records from results, and
 validates service payloads. Each transient tool failure permits up to three retries
 (four attempts total). Successful writes are idempotent within a conversation.
