@@ -10,7 +10,7 @@ provides no medical advice and has no connection to real patients or services.
 uv sync --locked
 export OPENROUTER_API_KEY=...
 export LLM_PROVIDER=openrouter
-export VICTIM_MODEL=qwen/qwen3.8-flash
+export VICTIM_MODEL=z-ai/glm-5.3
 uv run --locked python -m clinicdesk.eval --task t01 --seed 0
 uv run --locked pytest
 ```

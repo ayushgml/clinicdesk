@@ -4,6 +4,7 @@ from dataclasses import dataclass
 
 # USD per million tokens, OpenRouter catalog snapshot 2026-10-11.
 PRICES = {
+    "z-ai/glm-5.3": (0.039, 4.8),
     "qwen/qwen3.8-flash": (0.15, 0.47),
     "meta-llama/llama-3.1-8b-instruct": (0.05, 0.08),
     "google/gemini-3.8-flash": (0.75, 3.75),
@@ -24,7 +25,7 @@ class LLM:
         self.provider = os.getenv("LLM_PROVIDER") or ("anthropic" if os.getenv("ANTHROPIC_API_KEY") else "openrouter")
         if self.provider not in ("anthropic", "openrouter"):
             raise ValueError("LLM_PROVIDER must be anthropic or openrouter")
-        self.model = os.getenv("VICTIM_MODEL") or ("claude-sonnet-4-6" if self.provider == "anthropic" else "qwen/qwen3.8-flash")
+        self.model = os.getenv("VICTIM_MODEL") or ("claude-sonnet-4-6" if self.provider == "anthropic" else "z-ai/glm-5.3")
         key_name = "ANTHROPIC_API_KEY" if self.provider == "anthropic" else "OPENROUTER_API_KEY"
         if not os.getenv(key_name):
             raise ValueError(f"Missing {key_name}")
